@@ -25,50 +25,69 @@ public class DataBaseSQLite extends SQLiteOpenHelper {
     }
 
     public static final String TABLE_NAME_INC = "income";
-    public static final String COLUMN_IN_ID = "id";
-    public static final String COLUMN_IN_DESC = "description";
-    public static final String COLUMN_IN_AM = "amount";
-    public static final String COLUMN_IN_TIMESTAMP = "timeStamp";
+    public static final String COLUMN_IN_ID = "idinc";
+    public static final String COLUMN_IN_DESC = "descriptioninc";
+    public static final String COLUMN_IN_AM = "amountinc";
+    public static final String COLUMN_IN_TIMESTAMP = "timeStampinc";
 
     public static final String TABLE_NAME_EXP = "expenses";
-    public static final String COLUMN_EXP_ID = "id";
-    public static final String COLUMN_EXP_DESC = "description";
-    public static final String COLUMN_EXP_AM = "amount";
-    public static final String COLUMN_EXP_TIMESTAMP = "timeStamp";
+    public static final String COLUMN_EXP_ID = "idexp";
+    public static final String COLUMN_EXP_DESC = "descriptionexp";
+    public static final String COLUMN_EXP_AM = "amountexp";
+    public static final String COLUMN_EXP_TIMESTAMP = "timeStampexp";
+
+    public static final String TABLE_NAME_TMP = "temporary";
+    public static final String COLUMN_TMP_ID = "idtemp";
+    public static final String COLUMN_TMP_DATA = "datatemp";
+    public static final String COLUMN_TMP_NT = "tablenametemp";
+    public static final String COLUMN_TMP_TIMESTAMP = "timeStampexp";
 
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("create table " + TABLE_NAME_INC + " ( " + COLUMN_IN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + COLUMN_IN_ID + " TEXT, " + COLUMN_IN_DESC + " TEXT, " + COLUMN_IN_AM + "TEXT, " + COLUMN_IN_TIMESTAMP + "TIMESTAMP DEFAULT CURRENT_TIMESTAMP);");
-        db.execSQL("create table " + TABLE_NAME_EXP + " ( " + COLUMN_EXP_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + COLUMN_EXP_ID + " TEXT, " + COLUMN_EXP_DESC + " TEXT, " + COLUMN_EXP_AM + "TEXT, "+ COLUMN_IN_TIMESTAMP + "TIMESTAMP DEFAULT CURRENT_TIMESTAMP);");
+        db.execSQL("create table " + TABLE_NAME_INC + " ( " + COLUMN_IN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + COLUMN_IN_DESC + " TEXT, " + COLUMN_IN_AM + "TEXT, " + COLUMN_IN_TIMESTAMP + "TIMESTAMP DEFAULT CURRENT_TIMESTAMP);");
+        db.execSQL("create table " + TABLE_NAME_EXP + " ( " + COLUMN_EXP_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + COLUMN_EXP_DESC + " TEXT, " + COLUMN_EXP_AM + "TEXT, "+ COLUMN_IN_TIMESTAMP + "TIMESTAMP DEFAULT CURRENT_TIMESTAMP);");
+        db.execSQL("create table " + TABLE_NAME_TMP + " ( " + COLUMN_TMP_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + COLUMN_TMP_DATA + " TEXT, " + COLUMN_TMP_NT + " TEXT, " + COLUMN_IN_TIMESTAMP + "TIMESTAMP DEFAULT CURRENT_TIMESTAMP);");
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXIST" + TABLE_NAME_INC);
         db.execSQL("DROP TABLE IF EXIST" + TABLE_NAME_EXP);
+        db.execSQL("DROP TABLE IF EXIST" + TABLE_NAME_TMP);
         onCreate(db);
     }
 
-    public boolean saveIncomeData(String desc,String amount){
+    public boolean saveIncomeData(String descinc,String amountinc){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cVal = new ContentValues();
-        cVal.put(COLUMN_IN_ID, "id");
-        cVal.put(COLUMN_IN_DESC,"desc");
-        cVal.put(COLUMN_IN_AM,"amount");
+        cVal.put(COLUMN_IN_ID, "idinc");
+        cVal.put(COLUMN_IN_DESC,"descinc");
+        cVal.put(COLUMN_IN_AM,"amountinc");
         cVal.put(COLUMN_IN_TIMESTAMP," time('now') " );
         long temp = db.insert(TABLE_NAME_INC, null, cVal);
         return temp != -1;
     }
 
-    public boolean saveExpensesData(String desc,String amount){
+    public boolean saveExpensesData(String descexp,String amountexp){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cVal = new ContentValues();
-        cVal.put(COLUMN_EXP_ID, "id");
-        cVal.put(COLUMN_EXP_DESC,"desc");
-        cVal.put(COLUMN_EXP_AM,"amount");
+        cVal.put(COLUMN_EXP_ID, "idexp");
+        cVal.put(COLUMN_EXP_DESC,"descexp");
+        cVal.put(COLUMN_EXP_AM,"amountexp");
         cVal.put(COLUMN_EXP_TIMESTAMP," time('now') " );
-        long temp = db.insert(TABLE_NAME_INC, null, cVal);
+        long temp = db.insert(TABLE_NAME_EXP, null, cVal);
+        return temp != -1;
+    }
+
+    public boolean saveTempData(){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues cVal = new ContentValues();
+        cVal.put(COLUMN_TMP_ID, "idtemp");
+        cVal.put(COLUMN_TMP_DATA, "datatemp");
+        cVal.put(COLUMN_TMP_NT, "tablenametemp");
+        cVal.put(COLUMN_TMP_TIMESTAMP, " time('now') ");
+        long temp = db.insert(TABLE_NAME_TMP, null, cVal);
         return temp != -1;
     }
 

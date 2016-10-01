@@ -12,12 +12,15 @@ import android.widget.Toast;
 
 import com.arianasp.finaltask.database.DataBaseSQLite;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 
 public class CardOverviewFragment extends Fragment implements View.OnClickListener  {
     DataBaseSQLite db;
     EditText tvDesription,tvAmount,tvStuff,tvPrice;
     Button buttonAddInc,buttonAddExp;
-    String descIncome, descExpenses, amountIncome, amountExpenses;
+//    String descIncome, descExpenses, amountIncome, amountExpenses;
     ProgressDialog dialogReg;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -31,7 +34,6 @@ public class CardOverviewFragment extends Fragment implements View.OnClickListen
         buttonAddInc.setOnClickListener(this);
         buttonAddExp = (Button)view.findViewById(R.id.buttonAddExpenses);
         buttonAddExp.setOnClickListener(this);
-
         return view;
     }
 
@@ -40,10 +42,13 @@ public class CardOverviewFragment extends Fragment implements View.OnClickListen
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.buttonAddIncome:
-                descIncome = tvDesription.getText().toString();
-                amountIncome = tvAmount.getText().toString();
-                if(descIncome.equals("") || amountIncome.equals("")){
-                    Toast.makeText(getActivity(), "Isi heula sadayana bray", Toast.LENGTH_LONG).show();
+                final String descIncome = tvDesription.getText().toString();
+                final String amountIncome = tvAmount.getText().toString();
+                if(!isValidDescription(descIncome)){
+                    Toast.makeText(getActivity(), "Isi heula desc na bray", Toast.LENGTH_LONG).show();
+                }
+                else if(!isValidAmount(amountIncome)){
+                    Toast.makeText(getActivity(), "Isi heula amount na bray", Toast.LENGTH_LONG).show();
                 }
                 else{
                     boolean resultInc = db.saveIncomeData(descIncome,amountIncome);
@@ -57,10 +62,10 @@ public class CardOverviewFragment extends Fragment implements View.OnClickListen
                 }
                 break;
             case R.id.buttonAddExpenses:
-                descExpenses = tvStuff.getText().toString();
-                amountExpenses = tvPrice.getText().toString();
-                if(descExpenses.equals("") || amountExpenses.equals("")){
-                    Toast.makeText(getActivity(), "Isi heula sadayana bray", Toast.LENGTH_LONG).show();
+                final String descExpenses = tvStuff.getText().toString();
+                final String amountExpenses = tvPrice.getText().toString();
+                if(!isValidDescription(descExpenses) || !isValidAmount(amountExpenses)){
+                    Toast.makeText(getActivity(), "Isi heula nu bener bray", Toast.LENGTH_LONG).show();
                 }
                 boolean resultExp = db.saveExpensesData(descExpenses, amountExpenses);
                 if (resultExp) {
@@ -72,6 +77,24 @@ public class CardOverviewFragment extends Fragment implements View.OnClickListen
                 }
                 break;
         }
+    }
+
+    // validating email id
+    private boolean isValidDescription(String desc) {
+        String PATTERN = "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@"
+                + "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
+
+        Pattern pattern = Pattern.compile(PATTERN);
+        Matcher matcher = pattern.matcher(desc);
+        return matcher.matches();
+    }
+
+    // validating password with retype password
+    private boolean isValidAmount(String amount) {
+        if (amount != null) {
+            return true;
+        }
+        return false;
     }
 
 

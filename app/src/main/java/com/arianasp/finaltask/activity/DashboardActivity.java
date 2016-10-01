@@ -33,55 +33,57 @@ public class DashboardActivity extends BaseActivity {
     TextView tvTotalInc,tvTotalExp,tvTotalBlc;
     private String rowID = null;
     DataBaseSQLite db;
+    ArrayList<TransactionIncomeData> tid = new ArrayList<>();
+    ArrayList<TransactionExpensesData> ted = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dashboard);
-
-        db = new DataBaseSQLite(DashboardActivity.this);
-
+        //interface recyclerview income
         recyclerViewIncome = (RecyclerView) findViewById(R.id.recyclerViewIncome);
-        recyclerViewIncome.setHasFixedSize(true);
-
-        recyclerViewExpenses = (RecyclerView) findViewById(R.id.recyclerViewExpenses);
-        recyclerViewExpenses.setHasFixedSize(true);//RecyclerView can perform several optimizations
-        // if it can know in advance that RecyclerView's size is not affected by the adapter contents.
-
-        //LinearLayoutManager
-        //Hanya mendukung satu kolom jika itu orientasinya vertical dan satu baris jika orientasinya horizontal.
         rvLmIncome = new LinearLayoutManager(this);
         recyclerViewIncome.setLayoutManager(rvLmIncome);
+        recyclerViewIncome.setHasFixedSize(true);
 
+        //interface recyclerview income
+        recyclerViewExpenses = (RecyclerView) findViewById(R.id.recyclerViewExpenses);
         rvLmExpenses = new LinearLayoutManager(this);
         recyclerViewExpenses.setLayoutManager(rvLmExpenses);
+        recyclerViewExpenses.setHasFixedSize(true);
 
+        db = new DataBaseSQLite(DashboardActivity.this);
+        db.getAllDataIncome();
+        db.getAllDataExpenses();
+
+        //adapter income
         rvAdapterIncome = new IncomeAdapter(db.getAllDataIncome());
         recyclerViewIncome.setAdapter(rvAdapterIncome);
 
+        //adapter expenses
         rvAdapterExpenses = new ExpenseAdapter(db.getAllDataExpenses());
         recyclerViewExpenses.setAdapter(rvAdapterExpenses);
 
-        int amountInc = 0;
-        tvTotalInc = (TextView) findViewById(R.id.tvTotalIncome);
-        while (cIn.moveToNext()) {
-            amountInc += cIn.getInt(cIn.getColumnIndex("AMOUNT"));
-        }
-        tvTotalInc.setText("Rp. " + String.valueOf(amountInc));
-
-        int amountExp = 0;
-        tvTotalExp = (TextView) findViewById(R.id.tvTotalExpenses);
-        while (cExp.moveToNext()) {
-            amountExp += cExp.getInt(cExp.getColumnIndex("AMOUNT"));
-        }
-        tvTotalExp.setText("Rp. " + String.valueOf(amountExp));
-
-        tvTotalBlc = (TextView) findViewById(R.id.tv_balancetotal);
-        tvTotalBlc.setText("Rp. " + String.valueOf(amountInc-amountExp));
+//        int amountInc = 0;
+//        tvTotalInc = (TextView) findViewById(R.id.tvTotalIncome);
+//        while (cIn.moveToNext()) {
+//            amountInc += cIn.getInt(cIn.getColumnIndex("AMOUNT"));
+//        }
+//        tvTotalInc.setText("Rp. " + String.valueOf(amountInc));
+//
+//        int amountExp = 0;
+//        tvTotalExp = (TextView) findViewById(R.id.tvTotalExpenses);
+//        while (cExp.moveToNext()) {
+//            amountExp += cExp.getInt(cExp.getColumnIndex("AMOUNT"));
+//        }
+//        tvTotalExp.setText("Rp. " + String.valueOf(amountExp));
+//
+//        tvTotalBlc = (TextView) findViewById(R.id.tv_balancetotal);
+//        tvTotalBlc.setText("Rp. " + String.valueOf(amountInc-amountExp));
     }
 
     public class IncomeAdapter extends RecyclerView.Adapter<IncomeAdapter.ViewHolder>{
-        private ArrayList<TransactionIncomeData> dataI = db.getAllDataIncome();
+        private ArrayList<TransactionIncomeData> dataI = new ArrayList<>();
 
         public IncomeAdapter(ArrayList<TransactionIncomeData> dataI){
             this.dataI = dataI;
@@ -107,14 +109,14 @@ public class DashboardActivity extends BaseActivity {
                     dialog.setContentView(R.layout.dialog_edit);
                     cIncome.moveToPosition(position);
 
-                    final int idxIncome =cIncome.getInt(cIncome.getColumnIndexOrThrow("ID"));
+                    final int idxIncome =cIncome.getInt(cIncome.getColumnIndexOrThrow("id"));
 
                     final EditText descIncome = (EditText) dialog.findViewById(R.id.edDesc);
-                    String getDescIncome = cIncome.getString(cIncome.getColumnIndex("DESCRIPTION"));
+                    String getDescIncome = cIncome.getString(cIncome.getColumnIndex("description"));
                     descIncome.setText(getDescIncome);
 
                     final EditText amoIncome = (EditText) dialog.findViewById(R.id. edAmount);
-                    String getAmoIncome = cIncome.getString(cIncome.getColumnIndex("AMOUNT"));
+                    String getAmoIncome = cIncome.getString(cIncome.getColumnIndex("amount"));
                     amoIncome.setText(getAmoIncome);
 
                     Button btnUpdate = (Button) dialog.findViewById(R.id.btnUpdate);
@@ -129,7 +131,6 @@ public class DashboardActivity extends BaseActivity {
                             dialog.dismiss();
                         }
                     });
-
                     Button btnDelete = (Button) dialog.findViewById(R.id.btnDelete);
                     btnDelete.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -142,7 +143,6 @@ public class DashboardActivity extends BaseActivity {
                             dialog.dismiss();
                         }
                     });
-
                     Button btnCancel = (Button) dialog.findViewById(R.id.btnCancel);
                     btnCancel.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -150,12 +150,9 @@ public class DashboardActivity extends BaseActivity {
                             dialog.dismiss();
                         }
                     });
-
                     dialog.show();
                 }
             });
-
-            //code utk put dialog
         }
 
         @Override
@@ -206,14 +203,14 @@ public class DashboardActivity extends BaseActivity {
                     dialog.setContentView(R.layout.dialog_edit);
                     cExpenses.moveToPosition(position);
 
-                    final int idxExpenses =cExpenses.getInt(cExpenses.getColumnIndexOrThrow("ID"));
+                    final int idxExpenses =cExpenses.getInt(cExpenses.getColumnIndexOrThrow("id"));
 
                     final EditText descExpense= (EditText) dialog.findViewById(R.id.edDesc);
-                    String getDescExpenses = cExpenses.getString(cExpenses.getColumnIndex("DESCRIPTION"));
+                    String getDescExpenses = cExpenses.getString(cExpenses.getColumnIndex("description"));
                     descExpense.setText(getDescExpenses);
 
                     final EditText amoExpenses = (EditText) dialog.findViewById(R.id.edAmount);
-                    String getAmoExpenses = cExpenses.getString(cExpenses.getColumnIndex("AMOUNT"));
+                    String getAmoExpenses = cExpenses.getString(cExpenses.getColumnIndex("amount"));
                     amoExpenses.setText(getAmoExpenses);
 
                     Button btnUpdate = (Button) dialog.findViewById(R.id.btnUpdate);
