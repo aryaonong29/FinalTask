@@ -11,13 +11,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.arianasp.finaltask.R;
-
 import com.arianasp.finaltask.database.DataBaseSQLite;
-import com.arianasp.finaltask.model.*;
+import com.arianasp.finaltask.model.TransactionExpensesData;
+import com.arianasp.finaltask.model.TransactionIncomeData;
+
+import java.util.ArrayList;
 
 
 public class DashboardActivity extends BaseActivity {
@@ -28,13 +31,15 @@ public class DashboardActivity extends BaseActivity {
     Cursor cIncome, cExpenses,cIn,cExp;
     int subTotalInc, subTotalExp;
     TextView tvTotalInc,tvTotalExp,tvTotalBlc;
+    private String rowID = null;
+    DataBaseSQLite db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dashboard);
 
-        final DataBaseSQLite db = new DataBaseSQLite(this);
+        db = new DataBaseSQLite(DashboardActivity.this);
 
         recyclerViewIncome = (RecyclerView) findViewById(R.id.recyclerViewIncome);
         recyclerViewIncome.setHasFixedSize(true);
@@ -46,14 +51,15 @@ public class DashboardActivity extends BaseActivity {
         //LinearLayoutManager
         //Hanya mendukung satu kolom jika itu orientasinya vertical dan satu baris jika orientasinya horizontal.
         rvLmIncome = new LinearLayoutManager(this);
-        rvLmExpenses = new LinearLayoutManager(this);
         recyclerViewIncome.setLayoutManager(rvLmIncome);
+
+        rvLmExpenses = new LinearLayoutManager(this);
         recyclerViewExpenses.setLayoutManager(rvLmExpenses);
 
-        rvAdapterIncome = new IncomeAdapter(putIncome());
+        rvAdapterIncome = new IncomeAdapter(db.getAllDataIncome());
         recyclerViewIncome.setAdapter(rvAdapterIncome);
 
-        rvAdapterExpenses = new ExpenseAdapter(putExpenses());
+        rvAdapterExpenses = new ExpenseAdapter(db.getAllDataExpenses());
         recyclerViewExpenses.setAdapter(rvAdapterExpenses);
 
         int amountInc = 0;
@@ -74,40 +80,11 @@ public class DashboardActivity extends BaseActivity {
         tvTotalBlc.setText("Rp. " + String.valueOf(amountInc-amountExp));
     }
 
-    //mthod Cursor interface, that provides random read-write access to the result set returned by a database query.
-    private String [] putIncome(){
-        String [] incomeA = new String[cIncome.getCount()];
-        while(cIncome.moveToNext()){
-            incomeA[cIncome.getPosition()] = cIncome.getString(1)+" "+cIncome.getString(2);
-        }
-        return incomeA;
-    }
-
-    //method untuk atur dan menampilkan transactionData untuk expenses
-    private String[] putExpenses(){
-        String[] expensesA = new String[cExpenses.getCount()];
-        while(cExpenses.moveToNext()){
-            expensesA[cExpenses.getPosition()] = cExpenses.getString(1)+" "+cExpenses.getString(2);
-        }
-        return expensesA;
-    }
-
     public class IncomeAdapter extends RecyclerView.Adapter<IncomeAdapter.ViewHolder>{
-        private String [] dataI;
+        private ArrayList<TransactionIncomeData> dataI = db.getAllDataIncome();
 
-        public class ViewHolder extends RecyclerView.ViewHolder{
-            public CardView cvIncome;
-            public TextView tvIncome;
-
-            public ViewHolder(View v){
-                super(v);
-                cvIncome = (CardView) v.findViewById(R.id.cvIncome);
-                tvIncome = (TextView) v.findViewById(R.id.tvIncome);
-            }
-        }
-
-        public IncomeAdapter(String [] data){
-            dataI = data;
+        public IncomeAdapter(ArrayList<TransactionIncomeData> dataI){
+            this.dataI = dataI;
         }
 
         @Override
@@ -119,9 +96,11 @@ public class DashboardActivity extends BaseActivity {
 
         @Override
         public void onBindViewHolder(ViewHolder holder, final int position) {
-            holder.tvIncome.setText(dataI[position]);
+            final TransactionIncomeData tid = dataI.get(position);
+            holder.tvIncomeDesc.setText(tid.getDescriptionIncome());
+            holder.tvIncomeAmount.setText(tid.getAmountIncome());
 
-            holder.tvIncome.setOnClickListener(new View.OnClickListener() {
+            holder.linearIncome.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     final Dialog dialog = new Dialog(DashboardActivity.this);
@@ -143,7 +122,7 @@ public class DashboardActivity extends BaseActivity {
                         @Override
                         public void onClick(View v) {
                             DataBaseSQLite myDB1 = new DataBaseSQLite(DashboardActivity.this);
-                            myDB1.updateIncomeData();
+                            myDB1.updateIncomeData(tid);
                             Toast.makeText(DashboardActivity.this, "UPDATED", Toast.LENGTH_SHORT).show();
                             finish();
                             startActivity(getIntent());
@@ -156,7 +135,7 @@ public class DashboardActivity extends BaseActivity {
                         @Override
                         public void onClick(View v) {
                             DataBaseSQLite myDB1 = new DataBaseSQLite(DashboardActivity.this);
-                            myDB1.deleteIncomeData();
+                            myDB1.deleteIncomeData(tid);
                             Toast.makeText(DashboardActivity.this, "DELETED", Toast.LENGTH_SHORT).show();
                             finish();
                             startActivity(getIntent());
@@ -181,28 +160,29 @@ public class DashboardActivity extends BaseActivity {
 
         @Override
         public int getItemCount() {
-            return dataI.length;
+            return dataI.size();
+        }
+
+        public class ViewHolder extends RecyclerView.ViewHolder{
+            public CardView cvIncome;
+            public LinearLayout linearIncome;
+            public TextView tvIncomeDesc, tvIncomeAmount;
+
+            public ViewHolder(View v){
+                super(v);
+                cvIncome = (CardView) v.findViewById(R.id.cvIncome);
+                linearIncome = new LinearLayout(DashboardActivity.this);
+                tvIncomeDesc = (TextView) v.findViewById(R.id.tvIncomeDesc);
+                tvIncomeAmount = (TextView) v.findViewById(R.id.tvIncomeAmount);
+            }
         }
     }
 
 
-
-
     public class ExpenseAdapter extends RecyclerView.Adapter<ExpenseAdapter.ViewHolder>{
-        private String[] dataE;
+        private ArrayList<TransactionExpensesData> dataE = db.getAllDataExpenses();
 
-        public class ViewHolder extends RecyclerView.ViewHolder{
-            public  CardView cvExpenses;
-            public TextView tvExpenses;
-
-            public ViewHolder(View v){
-                super(v);
-                cvExpenses = (CardView) v.findViewById(R.id.cvExpenses);
-                tvExpenses = (TextView) v.findViewById(R.id.tvExpenses);
-            }
-        }
-
-        public ExpenseAdapter(String[] data){
+        public ExpenseAdapter(ArrayList<TransactionExpensesData> data){
             dataE = data;
         }
 
@@ -215,9 +195,11 @@ public class DashboardActivity extends BaseActivity {
 
         @Override
         public void onBindViewHolder(ExpenseAdapter.ViewHolder holder, final int position) {
-            holder.tvExpenses.setText(dataE[position]);
+            final TransactionExpensesData ted = dataE.get(position);
+            holder.tvExpensesDesc.setText(ted.getDescriptionExpenses());
+            holder.tvExpensesAmount.setText(ted.getAmountExpenses());
 
-            holder.tvExpenses.setOnClickListener(new View.OnClickListener() {
+            holder.linearExpenses.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     final Dialog dialog = new Dialog(DashboardActivity.this);
@@ -239,7 +221,7 @@ public class DashboardActivity extends BaseActivity {
                         @Override
                         public void onClick(View v) {
                             DataBaseSQLite myDB1 = new DataBaseSQLite(DashboardActivity.this);
-                            myDB1.updateExpensesData();
+                            myDB1.updateExpensesData(ted);
                             Toast.makeText(DashboardActivity.this, "UPDATED", Toast.LENGTH_SHORT).show();
                             finish();
                             startActivity(getIntent());
@@ -252,7 +234,7 @@ public class DashboardActivity extends BaseActivity {
                         @Override
                         public void onClick(View v) {
                             DataBaseSQLite myDB1 = new DataBaseSQLite(DashboardActivity.this);
-                            myDB1.deleteExpensesData();
+                            myDB1.deleteExpensesData(ted);
                             Toast.makeText(DashboardActivity.this, "DELETED", Toast.LENGTH_SHORT).show();
                             finish();
                             startActivity(getIntent());
@@ -277,7 +259,21 @@ public class DashboardActivity extends BaseActivity {
 
         @Override
         public int getItemCount() {
-            return dataE.length;
+            return dataE.size();
+        }
+
+        public class ViewHolder extends RecyclerView.ViewHolder{
+            public  CardView cvExpenses;
+            public LinearLayout linearExpenses;
+            public TextView tvExpensesDesc, tvExpensesAmount;
+
+            public ViewHolder(View v){
+                super(v);
+                cvExpenses = (CardView) v.findViewById(R.id.cvExpenses);
+                linearExpenses = new LinearLayout(DashboardActivity.this);
+                tvExpensesDesc = (TextView) v.findViewById(R.id.tvExpenseDesc);
+                tvExpensesAmount = (TextView) v.findViewById(R.id.tvExpensesAmount);
+            }
         }
     }
 }

@@ -10,4 +10,10 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.arianasp.finaltask.activity.TransactionActivity">
 
+    <fragment
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/fragment_place"
+        android:name="com.arianasp.finaltask.CardOverviewFragment"
+        tools:layout="@layout/fragment_card"></fragment>
 </RelativeLayout>

@@ -9,7 +9,6 @@ import android.database.sqlite.SQLiteOpenHelper;
 import com.arianasp.finaltask.model.TransactionExpensesData;
 import com.arianasp.finaltask.model.TransactionIncomeData;
 
-import java.sql.Date;
 import java.util.ArrayList;
 
 /**
@@ -51,7 +50,7 @@ public class DataBaseSQLite extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    public boolean saveIncomeData(int id, String desc, String amount, Date time){
+    public boolean saveIncomeData(String desc,String amount){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cVal = new ContentValues();
         cVal.put(COLUMN_IN_ID, "id");
@@ -62,7 +61,7 @@ public class DataBaseSQLite extends SQLiteOpenHelper {
         return temp != -1;
     }
 
-    public boolean saveExpensesData(int id, String desc, String amount, Date time){
+    public boolean saveExpensesData(String desc,String amount){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cVal = new ContentValues();
         cVal.put(COLUMN_EXP_ID, "id");
@@ -83,12 +82,12 @@ public class DataBaseSQLite extends SQLiteOpenHelper {
 
     }
 
-    public void updateExpensesData(TransactionExpensesData tid){
+    public void updateExpensesData(TransactionExpensesData ted){
         SQLiteDatabase db = this.getReadableDatabase();
         ContentValues cVal = new ContentValues();
-        cVal.put(COLUMN_EXP_DESC, tid.getDescriptionExpenses());
-        cVal.put(COLUMN_EXP_AM, tid.getAmountExpenses());
-        db.update(TABLE_NAME_EXP, cVal, COLUMN_EXP_ID + " = ?", new String[]{tid.getIdExpenses()});
+        cVal.put(COLUMN_EXP_DESC, ted.getDescriptionExpenses());
+        cVal.put(COLUMN_EXP_AM, ted.getAmountExpenses());
+        db.update(TABLE_NAME_EXP, cVal, COLUMN_EXP_ID + " = ?", new String[]{ted.getIdExpenses()});
         db.close();
     }
 
