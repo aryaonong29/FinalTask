@@ -12,15 +12,12 @@ import android.widget.Toast;
 
 import com.arianasp.finaltask.database.DataBaseSQLite;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 
 public class CardOverviewFragment extends Fragment implements View.OnClickListener  {
     DataBaseSQLite db;
     EditText tvDesription,tvAmount,tvStuff,tvPrice;
     Button buttonAddInc,buttonAddExp;
-//    String descIncome, descExpenses, amountIncome, amountExpenses;
+    String descIncome, descExpenses, amountIncome, amountExpenses;
     ProgressDialog dialogReg;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -37,21 +34,35 @@ public class CardOverviewFragment extends Fragment implements View.OnClickListen
         return view;
     }
 
+//    // validating desc
+//    private boolean isValidDescription(String desc) {
+//        String PATTERN = "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@"
+//                + "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
+//
+//        Pattern pattern = Pattern.compile(PATTERN);
+//        Matcher matcher = pattern.matcher(desc);
+//        return matcher.matches();
+//    }
+//
+//    // validating amount
+//    private boolean isValidAmount(String amount) {
+//        if (amount != null) {
+//            return true;
+//        }
+//        return false;
+//    }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.buttonAddIncome:
-                final String descIncome = tvDesription.getText().toString();
-                final String amountIncome = tvAmount.getText().toString();
-                if(!isValidDescription(descIncome)){
+                descIncome = tvDesription.getText().toString();
+                amountIncome = tvAmount.getText().toString();
+                boolean resultInc = db.insertIncomeData(descIncome,amountIncome);
+                if(descIncome.length()==0 && amountIncome.length()==0){
                     Toast.makeText(getActivity(), "Isi heula desc na bray", Toast.LENGTH_LONG).show();
                 }
-                else if(!isValidAmount(amountIncome)){
-                    Toast.makeText(getActivity(), "Isi heula amount na bray", Toast.LENGTH_LONG).show();
-                }
                 else{
-                    boolean resultInc = db.saveIncomeData(descIncome,amountIncome);
                     if (resultInc) {
                         Toast.makeText(getActivity(), "Inc Sukses Bro", Toast.LENGTH_SHORT).show();
                         tvDesription.setText("");
@@ -62,12 +73,12 @@ public class CardOverviewFragment extends Fragment implements View.OnClickListen
                 }
                 break;
             case R.id.buttonAddExpenses:
-                final String descExpenses = tvStuff.getText().toString();
-                final String amountExpenses = tvPrice.getText().toString();
-                if(!isValidDescription(descExpenses) || !isValidAmount(amountExpenses)){
-                    Toast.makeText(getActivity(), "Isi heula nu bener bray", Toast.LENGTH_LONG).show();
+                descExpenses = tvStuff.getText().toString();
+                amountExpenses = tvPrice.getText().toString();
+                if(descExpenses.length()==0 || amountExpenses.length()==0){
+                    Toast.makeText(getActivity(), "Isi heula exp na bray", Toast.LENGTH_LONG).show();
                 }
-                boolean resultExp = db.saveExpensesData(descExpenses, amountExpenses);
+                boolean resultExp = db.insertExpensesData(descExpenses, amountExpenses);
                 if (resultExp) {
                     Toast.makeText(getActivity(), "Exp Sukses Bro", Toast.LENGTH_SHORT).show();
                     tvStuff.setText("");
@@ -78,24 +89,4 @@ public class CardOverviewFragment extends Fragment implements View.OnClickListen
                 break;
         }
     }
-
-    // validating email id
-    private boolean isValidDescription(String desc) {
-        String PATTERN = "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@"
-                + "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
-
-        Pattern pattern = Pattern.compile(PATTERN);
-        Matcher matcher = pattern.matcher(desc);
-        return matcher.matches();
-    }
-
-    // validating password with retype password
-    private boolean isValidAmount(String amount) {
-        if (amount != null) {
-            return true;
-        }
-        return false;
-    }
-
-
 }

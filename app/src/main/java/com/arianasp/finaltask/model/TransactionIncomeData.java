@@ -12,11 +12,11 @@ public class TransactionIncomeData {
     public String amountIncome;
     public Timestamp timeInc;
 
-//    public TransactionIncomeData(String idIncome, String descriptionIncome, String amountIncome) {
-//        this.idIncome = idIncome;
-//        this.descriptionIncome = descriptionIncome;
-//        this.amountIncome = amountIncome;
-//    }
+    public TransactionIncomeData(String idIncome, String descriptionIncome, String amountIncome) {
+        this.idIncome = idIncome;
+        this.descriptionIncome = descriptionIncome;
+        this.amountIncome = amountIncome;
+    }
 
     public String getIdIncome() {
         return idIncome;

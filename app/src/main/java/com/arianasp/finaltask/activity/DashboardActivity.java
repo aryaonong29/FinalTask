@@ -1,21 +1,14 @@
 package com.arianasp.finaltask.activity;
 
-import android.app.Dialog;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.arianasp.finaltask.R;
+import com.arianasp.finaltask.adapter.ExpensesAdapter;
+import com.arianasp.finaltask.adapter.IncomeAdapter;
 import com.arianasp.finaltask.database.DataBaseSQLite;
 import com.arianasp.finaltask.model.TransactionExpensesData;
 import com.arianasp.finaltask.model.TransactionIncomeData;
@@ -53,224 +46,53 @@ public class DashboardActivity extends BaseActivity {
         recyclerViewExpenses.setHasFixedSize(true);
 
         db = new DataBaseSQLite(DashboardActivity.this);
-        db.getAllDataIncome();
-        db.getAllDataExpenses();
+        cIn = db.getDataIncome();
+        cExp = db.getDataExpenses();
+
 
         //adapter income
-        rvAdapterIncome = new IncomeAdapter(db.getAllDataIncome());
+        rvAdapterIncome = new IncomeAdapter(putCursorIncome());
         recyclerViewIncome.setAdapter(rvAdapterIncome);
 
+
         //adapter expenses
-        rvAdapterExpenses = new ExpenseAdapter(db.getAllDataExpenses());
+        rvAdapterExpenses = new ExpensesAdapter(putCursorExpenses());
         recyclerViewExpenses.setAdapter(rvAdapterExpenses);
 
-//        int amountInc = 0;
-//        tvTotalInc = (TextView) findViewById(R.id.tvTotalIncome);
-//        while (cIn.moveToNext()) {
-//            amountInc += cIn.getInt(cIn.getColumnIndex("AMOUNT"));
-//        }
-//        tvTotalInc.setText("Rp. " + String.valueOf(amountInc));
-//
-//        int amountExp = 0;
-//        tvTotalExp = (TextView) findViewById(R.id.tvTotalExpenses);
-//        while (cExp.moveToNext()) {
-//            amountExp += cExp.getInt(cExp.getColumnIndex("AMOUNT"));
-//        }
-//        tvTotalExp.setText("Rp. " + String.valueOf(amountExp));
-//
-//        tvTotalBlc = (TextView) findViewById(R.id.tv_balancetotal);
-//        tvTotalBlc.setText("Rp. " + String.valueOf(amountInc-amountExp));
+        int amountInc = 0;
+        tvTotalInc = (TextView) findViewById(R.id.tvTotalIncome);
+        while (cIn.moveToNext()) {
+            amountInc += cIn.getInt(cIn.getColumnIndex("amountinc"));
+        }
+        tvTotalInc.setText("Rp. " + String.valueOf(amountInc));
+
+        int amountExp = 0;
+        tvTotalExp = (TextView) findViewById(R.id.tvTotalExpenses);
+        while (cExp.moveToNext()) {
+            amountExp += cExp.getInt(cExp.getColumnIndex("amountexp"));
+        }
+        tvTotalExp.setText("Rp. " + String.valueOf(amountExp));
+
+        tvTotalBlc = (TextView) findViewById(R.id.tv_balancetotal);
+        tvTotalBlc.setText("Rp. " + String.valueOf(amountInc-amountExp));
     }
 
-    public class IncomeAdapter extends RecyclerView.Adapter<IncomeAdapter.ViewHolder>{
-        private ArrayList<TransactionIncomeData> dataI = new ArrayList<>();
-
-        public IncomeAdapter(ArrayList<TransactionIncomeData> dataI){
-            this.dataI = dataI;
+    private ArrayList<TransactionIncomeData> putCursorIncome(){
+        ArrayList<TransactionIncomeData> tid = new ArrayList<>();
+        String [] exp = new String[cExpenses.getCount()];
+        while(cIncome.moveToNext()){
+            exp[cIncome.getPosition()] = cExpenses.getString(1)+" "+cExpenses.getString(2);
         }
-
-        @Override
-        public IncomeAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_income, parent, false);
-            ViewHolder vhdr = new ViewHolder(view);
-            return vhdr;
-        }
-
-        @Override
-        public void onBindViewHolder(ViewHolder holder, final int position) {
-            final TransactionIncomeData tid = dataI.get(position);
-            holder.tvIncomeDesc.setText(tid.getDescriptionIncome());
-            holder.tvIncomeAmount.setText(tid.getAmountIncome());
-
-            holder.linearIncome.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    final Dialog dialog = new Dialog(DashboardActivity.this);
-                    dialog.setContentView(R.layout.dialog_edit);
-                    cIncome.moveToPosition(position);
-
-                    final int idxIncome =cIncome.getInt(cIncome.getColumnIndexOrThrow("id"));
-
-                    final EditText descIncome = (EditText) dialog.findViewById(R.id.edDesc);
-                    String getDescIncome = cIncome.getString(cIncome.getColumnIndex("description"));
-                    descIncome.setText(getDescIncome);
-
-                    final EditText amoIncome = (EditText) dialog.findViewById(R.id. edAmount);
-                    String getAmoIncome = cIncome.getString(cIncome.getColumnIndex("amount"));
-                    amoIncome.setText(getAmoIncome);
-
-                    Button btnUpdate = (Button) dialog.findViewById(R.id.btnUpdate);
-                    btnUpdate.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            DataBaseSQLite myDB1 = new DataBaseSQLite(DashboardActivity.this);
-                            myDB1.updateIncomeData(tid);
-                            Toast.makeText(DashboardActivity.this, "UPDATED", Toast.LENGTH_SHORT).show();
-                            finish();
-                            startActivity(getIntent());
-                            dialog.dismiss();
-                        }
-                    });
-                    Button btnDelete = (Button) dialog.findViewById(R.id.btnDelete);
-                    btnDelete.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            DataBaseSQLite myDB1 = new DataBaseSQLite(DashboardActivity.this);
-                            myDB1.deleteIncomeData(tid);
-                            Toast.makeText(DashboardActivity.this, "DELETED", Toast.LENGTH_SHORT).show();
-                            finish();
-                            startActivity(getIntent());
-                            dialog.dismiss();
-                        }
-                    });
-                    Button btnCancel = (Button) dialog.findViewById(R.id.btnCancel);
-                    btnCancel.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            dialog.dismiss();
-                        }
-                    });
-                    dialog.show();
-                }
-            });
-        }
-
-        @Override
-        public int getItemCount() {
-            return dataI.size();
-        }
-
-        public class ViewHolder extends RecyclerView.ViewHolder{
-            public CardView cvIncome;
-            public LinearLayout linearIncome;
-            public TextView tvIncomeDesc, tvIncomeAmount;
-
-            public ViewHolder(View v){
-                super(v);
-                cvIncome = (CardView) v.findViewById(R.id.cvIncome);
-                linearIncome = new LinearLayout(DashboardActivity.this);
-                tvIncomeDesc = (TextView) v.findViewById(R.id.tvIncomeDesc);
-                tvIncomeAmount = (TextView) v.findViewById(R.id.tvIncomeAmount);
-            }
-        }
+        return tid;
     }
 
-
-    public class ExpenseAdapter extends RecyclerView.Adapter<ExpenseAdapter.ViewHolder>{
-        private ArrayList<TransactionExpensesData> dataE = db.getAllDataExpenses();
-
-        public ExpenseAdapter(ArrayList<TransactionExpensesData> data){
-            dataE = data;
+    private ArrayList<TransactionExpensesData> putCursorExpenses(){
+        ArrayList<TransactionExpensesData> ted = new ArrayList<>();
+        String [] inc = new String[cIncome.getCount()];
+        while(cIncome.moveToNext()){
+            inc[cIncome.getPosition()] = cIncome.getString(1)+" "+cIncome.getString(2);
         }
-
-        @Override
-        public ExpenseAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_expenses, parent, false);
-            ViewHolder vhdr = new ViewHolder(v);
-            return vhdr;
-        }
-
-        @Override
-        public void onBindViewHolder(ExpenseAdapter.ViewHolder holder, final int position) {
-            final TransactionExpensesData ted = dataE.get(position);
-            holder.tvExpensesDesc.setText(ted.getDescriptionExpenses());
-            holder.tvExpensesAmount.setText(ted.getAmountExpenses());
-
-            holder.linearExpenses.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    final Dialog dialog = new Dialog(DashboardActivity.this);
-                    dialog.setContentView(R.layout.dialog_edit);
-                    cExpenses.moveToPosition(position);
-
-                    final int idxExpenses =cExpenses.getInt(cExpenses.getColumnIndexOrThrow("id"));
-
-                    final EditText descExpense= (EditText) dialog.findViewById(R.id.edDesc);
-                    String getDescExpenses = cExpenses.getString(cExpenses.getColumnIndex("description"));
-                    descExpense.setText(getDescExpenses);
-
-                    final EditText amoExpenses = (EditText) dialog.findViewById(R.id.edAmount);
-                    String getAmoExpenses = cExpenses.getString(cExpenses.getColumnIndex("amount"));
-                    amoExpenses.setText(getAmoExpenses);
-
-                    Button btnUpdate = (Button) dialog.findViewById(R.id.btnUpdate);
-                    btnUpdate.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            DataBaseSQLite myDB1 = new DataBaseSQLite(DashboardActivity.this);
-                            myDB1.updateExpensesData(ted);
-                            Toast.makeText(DashboardActivity.this, "UPDATED", Toast.LENGTH_SHORT).show();
-                            finish();
-                            startActivity(getIntent());
-                            dialog.dismiss();
-                        }
-                    });
-
-                    Button btnDelete = (Button) dialog.findViewById(R.id.btnDelete);
-                    btnDelete.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            DataBaseSQLite myDB1 = new DataBaseSQLite(DashboardActivity.this);
-                            myDB1.deleteExpensesData(ted);
-                            Toast.makeText(DashboardActivity.this, "DELETED", Toast.LENGTH_SHORT).show();
-                            finish();
-                            startActivity(getIntent());
-                            dialog.dismiss();
-                        }
-                    });
-
-                    Button btnCancel = (Button) dialog.findViewById(R.id.btnCancel);
-                    btnCancel.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            dialog.dismiss();
-                        }
-                    });
-
-                    dialog.show();
-                }
-            });
-
-            //code utk put dialog
-        }
-
-        @Override
-        public int getItemCount() {
-            return dataE.size();
-        }
-
-        public class ViewHolder extends RecyclerView.ViewHolder{
-            public  CardView cvExpenses;
-            public LinearLayout linearExpenses;
-            public TextView tvExpensesDesc, tvExpensesAmount;
-
-            public ViewHolder(View v){
-                super(v);
-                cvExpenses = (CardView) v.findViewById(R.id.cvExpenses);
-                linearExpenses = new LinearLayout(DashboardActivity.this);
-                tvExpensesDesc = (TextView) v.findViewById(R.id.tvExpenseDesc);
-                tvExpensesAmount = (TextView) v.findViewById(R.id.tvExpensesAmount);
-            }
-        }
+        return ted;
     }
+
 }

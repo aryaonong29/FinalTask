@@ -12,11 +12,11 @@ public class TransactionExpensesData {
     public String amountExpenses;
     public Timestamp timeExp;
 
-//    public TransactionExpensesData(String idExpenses, String descriptionExpenses, String amountExpenses) {
-//        this.idExpenses = idExpenses;
-//        this.descriptionExpenses = descriptionExpenses;
-//        this.amountExpenses = amountExpenses;
-//    }
+    public TransactionExpensesData(String idExpenses, String descriptionExpenses, String amountExpenses) {
+        this.idExpenses = idExpenses;
+        this.descriptionExpenses = descriptionExpenses;
+        this.amountExpenses = amountExpenses;
+    }
 
     public String getIdExpenses() {
         return idExpenses;
