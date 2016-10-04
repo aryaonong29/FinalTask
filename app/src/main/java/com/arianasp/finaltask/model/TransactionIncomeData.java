@@ -24,7 +24,7 @@ public class TransactionIncomeData {
         this.amountIncome = amountIncome;
     }
 
-    public int getIdIncome(int i) {
+    public int getIdIncome() {
         return idIncome;
     }
 
