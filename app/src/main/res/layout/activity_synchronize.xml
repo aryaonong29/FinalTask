@@ -8,6 +8,53 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
+    android:background="#00B0FF"
     tools:context="com.arianasp.finaltask.activity.SynchronizeActivity">
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAlignment="center"
+        android:id="@+id/textView"
+        android:text="Synchronize Page"
+        android:textSize="35sp"
+        android:fontFamily="sans-serif-condensed"
+        android:textAllCaps="true"
+        android:textStyle="bold"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="43dp" />
+
+
+    <Button
+        android:id="@+id/btnSync"
+        android:layout_width="wrap_content"
+        android:layout_height="70dp"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:text="SYNCHRONIZE NOW"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="70dp"
+        android:id="@+id/tvStatus"
+        android:layout_below="@+id/btnSync"
+        android:paddingTop="20dp"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:text="STATUS"/>
+
+    <TextView
+        android:layout_width="370dp"
+        android:layout_height="300dp"
+        android:id="@+id/tvLastData"
+        android:layout_below="@+id/tvStatus"
+        android:paddingTop="20dp"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:hint="RESPONSE"
+        android:textAlignment="center"
+        android:scrollbars="vertical"/>
+
 </RelativeLayout>
+

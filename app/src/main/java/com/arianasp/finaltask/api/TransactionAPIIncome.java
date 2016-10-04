@@ -1,6 +1,7 @@
 package com.arianasp.finaltask.api;
 
 import com.arianasp.finaltask.model.TransactionIncomeData;
+import com.arianasp.finaltask.serialization.TransactionSerializedIncome;
 
 import retrofit2.Call;
 import retrofit2.http.Body;

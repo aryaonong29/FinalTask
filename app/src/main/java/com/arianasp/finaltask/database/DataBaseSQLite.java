@@ -93,6 +93,12 @@ public class DataBaseSQLite extends SQLiteOpenHelper {
         return tidList;
     }
 
+    public Cursor getDataIncCur(){
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor curInc = db.rawQuery("select *  from " +table_income,null);
+        return curInc;
+    }
+
     //ambil total data income
     public int getIncomeCount(){
         String countQuery = "select * from " + table_income;
